@@ -11,5 +11,10 @@ import retrofit2.http.Query;
  */
 public interface ToiletAPI {
     @GET("lbitest/json-toilet-v2.php")
-    Call<Toilets> getToilet(@Query("lat") String lat, @Query("lng") String lng, @Query("lang") String lang);
+    Call<Toilets> getToilet(@Query("lat") String lat,
+                            @Query("lng") String lng,
+                            @Query("lang") String lang,
+                            @Query("row_index") String row,
+                            @Query("display_row") String displayRow
+    );
 }

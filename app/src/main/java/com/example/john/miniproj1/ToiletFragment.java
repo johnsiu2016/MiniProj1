@@ -50,6 +50,7 @@ public class ToiletFragment extends ListFragment implements
     private String lat;
     private String lng;
     private String lang;
+    private String toiletsNum;
     private String baseUrl = "http://plbpc013.ouhk.edu.hk/";
 
     @Override
@@ -161,8 +162,9 @@ public class ToiletFragment extends ListFragment implements
     private void getToiletData() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         lang = prefs.getString("lang_list", "zh_tw");
+        toiletsNum = prefs.getString("toilets_list", "10");
 
-        call = toiletAPI.getToilet(lat, lng, lang);
+        call = toiletAPI.getToilet(lat, lng, lang, "0", toiletsNum);
 
         call.enqueue(new Callback<Toilets>() {
             @Override

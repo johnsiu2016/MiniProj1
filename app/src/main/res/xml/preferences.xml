@@ -7,4 +7,12 @@
         android:key="lang_list"
         android:summary="Choose language"
         android:title="Language"/>
+
+    <ListPreference
+        android:dialogTitle="Show how many number of Toilets"
+        android:entries="@array/toilets_num"
+        android:entryValues="@array/toilets_num_codes"
+        android:key="toilets_list"
+        android:summary="Show how many entries at one time"
+        android:title="Number of Toilets"/>
 </PreferenceScreen>

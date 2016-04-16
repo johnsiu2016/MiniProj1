@@ -1,14 +1,27 @@
 package com.example.john.miniproj1.Model;
 
-import java.util.List;
-
 /**
- * Created by John on 15/4/2016.
+ * Created by John on 16/4/2016.
  */
 public class Toilet {
-    List<Results> results;
+    private String name;
+    private String address;
+    private String distance;
 
-    public List<Results> getResults() {
-        return results;
+    public String getName() {
+        return name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getDistance() {
+        return distance;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

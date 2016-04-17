@@ -53,6 +53,8 @@ public class ToiletFragment extends ListFragment implements
     private String toiletsNum;
     private String baseUrl = "http://plbpc013.ouhk.edu.hk/";
 
+    SharedPreferences prefs;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +65,8 @@ public class ToiletFragment extends ListFragment implements
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
@@ -160,8 +164,11 @@ public class ToiletFragment extends ListFragment implements
     }
 
     private void getToiletData() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
         lang = prefs.getString("lang_list", "zh_tw");
+
+        mySetTitle(lang);
+
         toiletsNum = prefs.getString("toilets_list", "10");
 
         call = toiletAPI.getToilet(lat, lng, lang, "0", toiletsNum);
@@ -182,5 +189,22 @@ public class ToiletFragment extends ListFragment implements
 
             }
         });
+    }
+
+    private void mySetTitle(String lang) {
+        switch (lang) {
+            case "zh_tw":
+                getActivity().setTitle(R.string.app_name);
+                break;
+            case "zh_cn":
+                getActivity().setTitle(R.string.app_name_cn);
+                break;
+            case "en_us":
+                getActivity().setTitle(R.string.app_name_en);
+                break;
+            default:
+                getActivity().setTitle(R.string.app_name);
+                break;
+        }
     }
 }

@@ -7,6 +7,8 @@ public class Toilet {
     private String name;
     private String address;
     private String distance;
+    private String lat;
+    private String lng;
 
     public String getName() {
         return name;
@@ -18,6 +20,14 @@ public class Toilet {
 
     public String getDistance() {
         return distance;
+    }
+
+    public String getLat() {
+        return lat;
+    }
+
+    public String getLng() {
+        return lng;
     }
 
     @Override

@@ -1,40 +1,42 @@
 package com.example.john.miniproj1;
 
 
-import android.app.Fragment;
 import android.app.ListFragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
+import android.renderscript.Double2;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.john.miniproj1.Adapter.MyAdapter;
+import com.example.john.miniproj1.Model.CurrentLocation;
+import com.example.john.miniproj1.Model.CurrentLocations;
 import com.example.john.miniproj1.Model.Toilets;
-import com.example.john.miniproj1.Service.ToiletAPI;
+import com.example.john.miniproj1.Service.GoogleService;
+import com.example.john.miniproj1.Service.ToiletService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
-import java.util.Locale;
-
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class ToiletFragment extends ListFragment implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -44,22 +46,50 @@ public class ToiletFragment extends ListFragment implements
     private Location mLastLocation;
 
     private Retrofit retrofit;
-    private ToiletAPI toiletAPI;
-    private Call<Toilets> call;
+
+    private ToiletService toiletService;
+    private Call<Toilets> toiletsCall;
+
+    private GoogleService googleSevice;
+    private Call<CurrentLocations> googleCall;
 
     private String lat;
     private String lng;
     private String lang;
     private String toiletsNum;
-    private String baseUrl = "http://plbpc013.ouhk.edu.hk/";
+    private String toiletsBaseUrl = "http://plbpc013.ouhk.edu.hk/";
+    private String currentLocationsBaseUrl = "https://maps.googleapis.com/";
 
     SharedPreferences prefs;
+
+    private Toilets mToilets;
+    private Contract mContract;
+
+    private TextView curretLocation;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         setHasOptionsMenu(true);
+
+        mContract = (ToiletFragment.Contract)getActivity();
+    }
+
+    @Override
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+        curretLocation = (TextView) rootView.findViewById(R.id.current_location);
+
+        rootView.findViewById(R.id.current_location).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mContract.onLocationSelected(mToilets, Double.parseDouble(lat), Double.parseDouble(lng));
+            }
+        });
+
+        return rootView;
     }
 
     @Override
@@ -68,12 +98,25 @@ public class ToiletFragment extends ListFragment implements
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
         retrofit = new Retrofit.Builder()
-                .baseUrl(baseUrl)
+                .baseUrl(toiletsBaseUrl)
+                .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        toiletAPI = retrofit.create(ToiletAPI.class);
+        toiletService = retrofit.create(ToiletService.class);
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl(currentLocationsBaseUrl)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        googleSevice = retrofit.create(GoogleService.class);
 
         buildGoogleApiClient();
     }
@@ -135,6 +178,7 @@ public class ToiletFragment extends ListFragment implements
         // in rare cases when a location is not available.
         getLocationData();
         getToiletData();
+        getGeoData();
     }
 
     @Override
@@ -171,15 +215,15 @@ public class ToiletFragment extends ListFragment implements
 
         toiletsNum = prefs.getString("toilets_list", "10");
 
-        call = toiletAPI.getToilet(lat, lng, lang, "0", toiletsNum);
+        toiletsCall = toiletService.getToilet(lat, lng, lang, "0", toiletsNum);
 
-        call.enqueue(new Callback<Toilets>() {
+        toiletsCall.enqueue(new Callback<Toilets>() {
             @Override
             public void onResponse(Call<Toilets> call, Response<Toilets> response) {
                 if (response.isSuccessful()) {
-                    Toilets toilets = response.body();
-                    if (toilets != null) {
-                        setListAdapter(new MyAdapter(getActivity(), R.layout.row, R.id.name, toilets.getResults()));
+                    mToilets = response.body();
+                    if (mToilets != null) {
+                        setListAdapter(new MyAdapter(getActivity(), R.layout.row, R.id.name, mToilets.getResults()));
                     }
                 }
             }
@@ -189,6 +233,32 @@ public class ToiletFragment extends ListFragment implements
 
             }
         });
+    }
+
+    private void getGeoData() {
+        String latlng = lat + "," + lng;
+        String key = "AIzaSyCKAFtLFhufGbucL2lGu3LJbDYWYW44EvA";
+
+        googleCall = googleSevice.getLocations(latlng, "zh_TW", key);
+
+        googleCall.enqueue(new Callback<CurrentLocations>() {
+            @Override
+            public void onResponse(Call<CurrentLocations> call, Response<CurrentLocations> response) {
+                if (response.isSuccessful()) {
+                    String currentLoc = response.body().getResults().get(0).getFormattedAddress();
+
+                    if (currentLoc != null) {
+                        curretLocation.setText(currentLoc);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CurrentLocations> call, Throwable t) {
+
+            }
+        });
+
     }
 
     private void mySetTitle(String lang) {
@@ -206,5 +276,9 @@ public class ToiletFragment extends ListFragment implements
                 getActivity().setTitle(R.string.app_name);
                 break;
         }
+    }
+
+    interface Contract {
+        void onLocationSelected(Toilets toilets, Double lat, Double lng);
     }
 }

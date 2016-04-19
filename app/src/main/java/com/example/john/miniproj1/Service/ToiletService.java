@@ -7,9 +7,9 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 /**
- * Created by John on 15/4/2016.
+ * Created by John on 19/4/2016.
  */
-public interface ToiletAPI {
+public interface ToiletService {
     @GET("lbitest/json-toilet-v2.php")
     Call<Toilets> getToilet(@Query("lat") String lat,
                             @Query("lng") String lng,

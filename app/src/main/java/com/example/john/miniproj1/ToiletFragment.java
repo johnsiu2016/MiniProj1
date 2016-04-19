@@ -245,9 +245,8 @@ public class ToiletFragment extends ListFragment implements
             @Override
             public void onResponse(Call<CurrentLocations> call, Response<CurrentLocations> response) {
                 if (response.isSuccessful()) {
-                    String currentLoc = response.body().getResults().get(0).getFormattedAddress();
-
-                    if (currentLoc != null) {
+                    if (response.body().getStatus().equals("OK")) {
+                        String currentLoc = response.body().getResults().get(0).getFormattedAddress();
                         curretLocation.setText(currentLoc);
                     }
                 }

@@ -7,8 +7,13 @@ import java.util.List;
  */
 public class CurrentLocations {
     List<CurrentLocation> results;
+    String status;
 
     public List<CurrentLocation> getResults() {
         return results;
+    }
+
+    public String getStatus() {
+        return status;
     }
 }

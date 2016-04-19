@@ -6,9 +6,9 @@
         <item>English</item>
     </string-array>
     <string-array name="lang_codes">
-        <item>zh_tw</item>
-        <item>zh_cn</item>
-        <item>en_us</item>
+        <item>@string/zh_tw</item>
+        <item>@string/zh_cn</item>
+        <item>@string/en</item>
     </string-array>
 
     <string-array name="toilets_num">

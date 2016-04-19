@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,7 +66,7 @@ public class ToiletFragment extends ListFragment implements
     private Toilets mToilets;
     private Contract mContract;
 
-    private TextView curretLocation;
+    private TextView currentLocation;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,12 +81,14 @@ public class ToiletFragment extends ListFragment implements
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        curretLocation = (TextView) rootView.findViewById(R.id.current_location);
+        currentLocation = (TextView) rootView.findViewById(R.id.current_location);
 
         rootView.findViewById(R.id.current_location).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mContract.onLocationSelected(mToilets, Double.parseDouble(lat), Double.parseDouble(lng));
+                if (lat != null && lng != null) {
+                    mContract.onLocationSelected(mToilets, Double.parseDouble(lat), Double.parseDouble(lng));
+                }
             }
         });
 
@@ -140,6 +143,11 @@ public class ToiletFragment extends ListFragment implements
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        mContract.onToiletSelected(mToilets.getResults().get(position).getName(), lat, lng);
     }
 
     @Override
@@ -239,7 +247,7 @@ public class ToiletFragment extends ListFragment implements
         String latlng = lat + "," + lng;
         String key = "AIzaSyCKAFtLFhufGbucL2lGu3LJbDYWYW44EvA";
 
-        googleCall = googleSevice.getLocations(latlng, "zh_TW", key);
+        googleCall = googleSevice.getLocations(latlng, lang, key);
 
         googleCall.enqueue(new Callback<CurrentLocations>() {
             @Override
@@ -247,7 +255,7 @@ public class ToiletFragment extends ListFragment implements
                 if (response.isSuccessful()) {
                     if (response.body().getStatus().equals("OK")) {
                         String currentLoc = response.body().getResults().get(0).getFormattedAddress();
-                        curretLocation.setText(currentLoc);
+                        currentLocation.setText(currentLoc);
                     }
                 }
             }
@@ -268,7 +276,7 @@ public class ToiletFragment extends ListFragment implements
             case "zh_cn":
                 getActivity().setTitle(R.string.app_name_cn);
                 break;
-            case "en_us":
+            case "en":
                 getActivity().setTitle(R.string.app_name_en);
                 break;
             default:
@@ -279,5 +287,6 @@ public class ToiletFragment extends ListFragment implements
 
     interface Contract {
         void onLocationSelected(Toilets toilets, Double lat, Double lng);
+        void onToiletSelected(String toiletName, String lat, String lng);
     }
 }

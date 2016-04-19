@@ -1,6 +1,7 @@
 package com.example.john.miniproj1;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -31,6 +32,15 @@ public class MainActivity extends AppCompatActivity implements ToiletFragment.Co
         intent.putExtra(MapsActivity.TOILETS, toi);
         intent.putExtra(MapsActivity.LAT, lat);
         intent.putExtra(MapsActivity.LNG, lng);
+
         startActivity(intent);
+    }
+
+    @Override
+    public void onToiletSelected(String toiletName, String lat, String lng) {
+        Uri gmmIntentUri = Uri.parse("geo:" + lat + "," + lng + "?q=" + Uri.encode(toiletName));
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        startActivity(mapIntent);
     }
 }

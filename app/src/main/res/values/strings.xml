@@ -4,9 +4,13 @@
     <string name="app_name_en">Find your best toilet</string>
     <string name="action_settings">Settings</string>
 
-    <string name="zh_tw">距離</string>
-    <string name="zh_cn">距离</string>
-    <string name="en_us">Distance</string>
+    <string name="distance_zh_tw">距離</string>
+    <string name="distance_zh_cn">距离</string>
+    <string name="distance_en_us">Distance</string>
+
+    <string name="zh_tw">zh_tw</string>
+    <string name="zh_cn">zh_cn</string>
+    <string name="en">en</string>
 
     <string name="reset">Reset</string>
     <string name="title_activity_maps">Map</string>

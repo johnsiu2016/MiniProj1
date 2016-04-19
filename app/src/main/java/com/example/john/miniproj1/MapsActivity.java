@@ -9,6 +9,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
@@ -31,7 +32,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
-
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -51,14 +51,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions()
                 .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
                 .position(new LatLng(lat, lng))
-                .title("Current Location"));
-
+                .title("Current Location")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                 new LatLng(lat, lng), 15));
 
         addToiletsMarker();
+
     }
+
+
 
     private void addToiletsMarker() {
         String toi = getIntent().getStringExtra(TOILETS);
@@ -70,12 +73,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             lat = Double.parseDouble(toilet.getLat());
             lng = Double.parseDouble(toilet.getLng());
 
+            Double dist = Math.round((Double.parseDouble(toilet.getDistance())*100))/100.0;
             // You can customize the marker image using images bundled with
             // your app, or dynamically generated bitmaps.
             mMap.addMarker(new MarkerOptions()
                     .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
                     .position(new LatLng(lat, lng))
-                    .title(toilet.getName()));
+                    .title(toilet.getName())
+                    .snippet(dist.toString() + "m"));
+
         }
     }
 }

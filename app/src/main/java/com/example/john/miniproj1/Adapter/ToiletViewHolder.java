@@ -73,17 +73,17 @@ public class ToiletViewHolder {
         String lang = prefs.getString("lang_list", "zh_tw");
         String label;
         switch (lang) {
-            case "zh_tw":
-                label = mContext.getString(R.string.zh_tw);
+            case "zh_tw:":
+                label = mContext.getString(R.string.distance_zh_tw);
                 break;
             case "zh_cn":
-                label = mContext.getString(R.string.zh_cn);
+                label = mContext.getString(R.string.distance_zh_cn);
                 break;
-            case "en_us":
-                label = mContext.getString(R.string.en_us);
+            case "en":
+                label = mContext.getString(R.string.distance_en_us);
                 break;
             default:
-                label = mContext.getString(R.string.zh_tw);
+                label = mContext.getString(R.string.distance_zh_tw);
                 break;
         }
         return label;
